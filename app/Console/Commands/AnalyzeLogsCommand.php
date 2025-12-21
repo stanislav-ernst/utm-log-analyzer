@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Parsers\NginxAccessLogParser;
+use App\Services\LicenseAccessAnalyzerService;
 use Illuminate\Console\Command;
 use SplFileObject;
 use Throwable;
@@ -22,6 +23,8 @@ class AnalyzeLogsCommand extends Command
      * @var string
      */
     protected $description = 'Analyze UTM access logs.';
+
+    private array $entries = [];
 
     public function __construct(
         private readonly NginxAccessLogParser $parser
@@ -58,17 +61,24 @@ class AnalyzeLogsCommand extends Command
 
         foreach ($file as $line) {
             try {
-                $this->parser->parse(trim($line));
+                $entry = $this->parser->parse(trim($line));
+                $this->entries[] = $entry;
                 $parsedCount++;
-
-                // TODO: Process parser return value.
             } catch (Throwable $e) {
                 $errorCount++;
             }
         }
 
+        $analyzer = app(LicenseAccessAnalyzerService::class);
+        $topSerials = $analyzer->topSerials($this->entries);
+
         $this->info("Parsed lines: {$parsedCount}");
         $this->warn("Failed lines: {$errorCount}");
+        $this->info('Top 10 license serials by access count:');
+
+        foreach ($topSerials as $serial => $count) {
+            $this->line(sprintf('%s → %d requests', $serial, $count));
+        }
 
         return self::SUCCESS;
     }
