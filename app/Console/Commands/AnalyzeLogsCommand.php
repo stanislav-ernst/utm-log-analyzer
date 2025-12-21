@@ -65,6 +65,14 @@ class AnalyzeLogsCommand extends Command
         $parsedCount = 0;
         $errorCount = 0;
 
+        $fileSize = filesize($path);
+        $progressBar = $this->output->createProgressBar($fileSize);
+        $progressBar->setMessage("Lines: {$parsedCount}", 'status');
+        $progressBar->setFormat(
+            '%status% | %percent%% [%bar%]'
+        );
+        $progressBar->start();
+
         foreach ($file as $line) {
             try {
                 $entry = $this->parser->parse(trim($line));
@@ -76,7 +84,17 @@ class AnalyzeLogsCommand extends Command
             } catch (Throwable $e) {
                 $errorCount++;
             }
+
+            // Update progress based on file position
+            $progressBar->setProgress($file->ftell());
+            $progressBar->setMessage("Lines: {$parsedCount}", 'status');
+            $progressBar->setFormat(
+                '%status% | %percent%% [%bar%]'
+            );
         }
+
+        $progressBar->finish();
+        $this->newLine(2);
 
         $this->info("Parsed lines: {$parsedCount}");
         $this->warn("Failed lines: {$errorCount}");
