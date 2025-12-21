@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Parsers\NginxAccessLogParser;
+use App\Services\HardwareAnalyzerService;
 use App\Services\LicenseAccessAnalyzerService;
 use App\Services\LicenseDeviceAnalyzerService;
 use Illuminate\Console\Command;
@@ -31,6 +32,7 @@ class AnalyzeLogsCommand extends Command
         private readonly NginxAccessLogParser $parser,
         private readonly LicenseAccessAnalyzerService $licenseAccessAnalyzer,
         private readonly LicenseDeviceAnalyzerService $licenseDeviceAnalyzer,
+        private readonly HardwareAnalyzerService $hardwareAnalyzer,
     ) {
         parent::__construct();
     }
@@ -68,6 +70,8 @@ class AnalyzeLogsCommand extends Command
                 $entry = $this->parser->parse(trim($line));
                 $this->licenseAccessAnalyzer->consume($entry);
                 $this->licenseDeviceAnalyzer->consume($entry);
+                $this->hardwareAnalyzer->consume($entry);
+
                 $parsedCount++;
             } catch (Throwable $e) {
                 $errorCount++;
@@ -86,6 +90,12 @@ class AnalyzeLogsCommand extends Command
 
         foreach ($this->licenseDeviceAnalyzer->violations() as $serial => $deviceCount) {
             $this->line(sprintf('%s → %d distinct devices', $serial, $deviceCount));
+        }
+
+        $this->info('Hardware classes and active license count:');
+
+        foreach ($this->hardwareAnalyzer->summary() as $hardwareClass => $count) {
+            $this->line(sprintf('%s → %d licenses', $hardwareClass, $count));
         }
 
         return self::SUCCESS;
