@@ -27,7 +27,8 @@ class AnalyzeLogsCommand extends Command
     private array $entries = [];
 
     public function __construct(
-        private readonly NginxAccessLogParser $parser
+        private readonly NginxAccessLogParser $parser,
+        private readonly LicenseAccessAnalyzerService $licenseAccessAnalyzer,
     ) {
         parent::__construct();
     }
@@ -38,8 +39,9 @@ class AnalyzeLogsCommand extends Command
      *
      * Validates the provided file path for readability. Reads the file line
      * by line, parsing each line using the parser. Tracks and logs the count
-     * of successfully parsed lines and failed parsing attempts. Returns an
-     * appropriate status code indicating success or failure.
+     * of successfully parsed lines and failed parsing attempts.
+     * Also analyzes license access and provides statistics.
+     * Returns an appropriate status code indicating success or failure.
      *
      * @return int The status code indicating the result of the file processing.
      */
@@ -62,21 +64,18 @@ class AnalyzeLogsCommand extends Command
         foreach ($file as $line) {
             try {
                 $entry = $this->parser->parse(trim($line));
-                $this->entries[] = $entry;
+                $this->licenseAccessAnalyzer->consume($entry);
                 $parsedCount++;
             } catch (Throwable $e) {
                 $errorCount++;
             }
         }
 
-        $analyzer = app(LicenseAccessAnalyzerService::class);
-        $topSerials = $analyzer->topSerials($this->entries);
-
         $this->info("Parsed lines: {$parsedCount}");
         $this->warn("Failed lines: {$errorCount}");
         $this->info('Top 10 license serials by access count:');
 
-        foreach ($topSerials as $serial => $count) {
+        foreach ($this->licenseAccessAnalyzer->topSerials() as $serial => $count) {
             $this->line(sprintf('%s → %d requests', $serial, $count));
         }
 

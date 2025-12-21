@@ -2,25 +2,40 @@
 
 namespace App\Services;
 
+use App\DTO\LogEntry;
+
 class LicenseAccessAnalyzerService
 {
+    /**
+     * Counted serials.
+     *
+     * @var array<string, int>
+     */
+    private array $counts = [];
+
     public function __construct() {}
 
     /**
-     * @param  iterable<LogEntry>  $entries
-     * @return array<string, int> serial => access count
+     * Consumes a log entry and updates the count for the associated serial.
+     *
+     * @param  LogEntry  $entry  Log entry object containing the serial.
      */
-    public function topSerials(iterable $entries, int $limit = 10): array
+    public function consume(LogEntry $entry): void
     {
-        $counts = [];
+        $serial = $entry->serial;
+        $this->counts[$serial] = ($this->counts[$serial] ?? 0) + 1;
+    }
 
-        foreach ($entries as $entry) {
-            $serial = $entry->serial;
-            $counts[$serial] = ($counts[$serial] ?? 0) + 1;
-        }
+    /**
+     * Retrieves the top serial numbers based on their count in descending order.
+     *
+     * @param  int  $limit  The maximum number of top serials to return. Defaults to 10.
+     * @return array An associative array of the top serials with their counts.
+     */
+    public function topSerials(int $limit = 10): array
+    {
+        arsort($this->counts);
 
-        arsort($counts);
-
-        return array_slice($counts, 0, $limit, true);
+        return array_slice($this->counts, 0, $limit, true);
     }
 }
