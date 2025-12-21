@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Parsers\NginxAccessLogParser;
 use App\Services\LicenseAccessAnalyzerService;
+use App\Services\LicenseDeviceAnalyzerService;
 use Illuminate\Console\Command;
 use SplFileObject;
 use Throwable;
@@ -29,6 +30,7 @@ class AnalyzeLogsCommand extends Command
     public function __construct(
         private readonly NginxAccessLogParser $parser,
         private readonly LicenseAccessAnalyzerService $licenseAccessAnalyzer,
+        private readonly LicenseDeviceAnalyzerService $licenseDeviceAnalyzer,
     ) {
         parent::__construct();
     }
@@ -65,6 +67,7 @@ class AnalyzeLogsCommand extends Command
             try {
                 $entry = $this->parser->parse(trim($line));
                 $this->licenseAccessAnalyzer->consume($entry);
+                $this->licenseDeviceAnalyzer->consume($entry);
                 $parsedCount++;
             } catch (Throwable $e) {
                 $errorCount++;
@@ -77,6 +80,12 @@ class AnalyzeLogsCommand extends Command
 
         foreach ($this->licenseAccessAnalyzer->topSerials() as $serial => $count) {
             $this->line(sprintf('%s → %d requests', $serial, $count));
+        }
+
+        $this->info('Top 10 license serials with multiple devices:');
+
+        foreach ($this->licenseDeviceAnalyzer->violations() as $serial => $deviceCount) {
+            $this->line(sprintf('%s → %d distinct devices', $serial, $deviceCount));
         }
 
         return self::SUCCESS;
