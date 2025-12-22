@@ -50,6 +50,7 @@ class AnalyzeLogsCommand extends Command
      * Returns an appropriate status code indicating success or failure.
      *
      * @return int The status code indicating the result of the file processing.
+     *
      * @throws Throwable
      */
     public function handle(): int
