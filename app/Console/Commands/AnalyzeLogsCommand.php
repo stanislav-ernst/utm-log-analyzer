@@ -2,11 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\ResultType;
+use App\Models\AnalysisResult;
+use App\Models\AnalysisRun;
 use App\Parsers\NginxAccessLogParser;
 use App\Services\HardwareAnalyzerService;
 use App\Services\LicenseAccessAnalyzerService;
 use App\Services\LicenseDeviceAnalyzerService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use SplFileObject;
 use Throwable;
 
@@ -58,6 +62,16 @@ class AnalyzeLogsCommand extends Command
             return self::FAILURE;
         }
 
+        /**
+         * ----------------------------
+         * Create new Analysis Run
+         * ----------------------------
+         */
+        $analysisRun = AnalysisRun::create([
+            'source_file' => $path,
+            'started_at' => now(),
+        ]);
+
         $file = new SplFileObject($path);
         $file->setFlags(SplFileObject::READ_AHEAD | SplFileObject::SKIP_EMPTY);
 
@@ -76,6 +90,11 @@ class AnalyzeLogsCommand extends Command
         $progressBar->setFormat('%status% | %percent%% [%bar%]');
         $progressBar->start();
 
+        /**
+         * ----------------------------
+         * Streaming Processing
+         * ----------------------------
+         */
         foreach ($file as $line) {
             try {
                 $entry = $this->parser->parse(trim($line));
@@ -101,8 +120,78 @@ class AnalyzeLogsCommand extends Command
         $progressBar->finish();
         $this->newLine(2);
 
+        /**
+         * ----------------------------
+         * Results persist
+         * ----------------------------
+         */
+        DB::transaction(function () use (
+            $analysisRun,
+            $parsedCount,
+            $errorCount
+        ) {
+            // Update Metadata
+            $analysisRun->update([
+                'finished_at' => now(),
+                'duration_seconds' => $analysisRun->started_at->diffInSeconds(now()),
+                'parsed_lines' => $parsedCount,
+                'error_lines' => $errorCount,
+            ]);
+
+            // Task 1 – Top Serials
+            AnalysisResult::create([
+                'analysis_run_id' => $analysisRun->id,
+                'result_type' => ResultType::LICENSE_ACCESS,
+                'payload' => [
+                    'items' => collect($this->licenseAccessAnalyzer->result())
+                        ->map(fn (int $count, string $serial) => [
+                            'serial' => $serial,
+                            'count' => $count,
+                        ])
+                        ->values()
+                        ->all(),
+                ],
+            ]);
+
+            // Task 2 – Multiple license use
+            AnalysisResult::create([
+                'analysis_run_id' => $analysisRun->id,
+                'result_type' => ResultType::MULTI_DEVICE,
+                'payload' => [
+                    'items' => collect($this->licenseDeviceAnalyzer->result())
+                        ->map(fn (int $devices, string $serial) => [
+                            'serial' => $serial,
+                            'devices' => $devices,
+                        ])
+                        ->values()
+                        ->all(),
+                ],
+            ]);
+
+            // Task 3 – Hardware classes
+            AnalysisResult::create([
+                'analysis_run_id' => $analysisRun->id,
+                'result_type' => ResultType::HARDWARE_CLASS,
+                'payload' => [
+                    'items' => collect($this->hardwareAnalyzer->result())
+                        ->map(fn (int $licenses, string $hardwareClass) => [
+                            'hardware_class' => $hardwareClass,
+                            'licenses' => $licenses,
+                        ])
+                        ->values()
+                        ->all(),
+                ],
+            ]);
+        });
+
+        /**
+         * ----------------------------
+         * Console output (optional)
+         * ----------------------------
+         */
         $this->info("Parsed lines: {$parsedCount}");
         $this->warn("Failed lines: {$errorCount}");
+        $this->info("Analysis run #{$analysisRun->id} stored successfully.");
         $this->info('Top 10 license serials by access count:');
 
         foreach ($this->licenseAccessAnalyzer->result() as $serial => $count) {
