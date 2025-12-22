@@ -14,7 +14,7 @@ erfolgt speicherschonend, sodass auch sehr große Logdateien effizient analysier
 
 Das Projekt wurde im Rahmen einer technischen Testaufgabe erstellt und konzentriert sich bewusst auf Code-Qualität, Verständlichkeit und Erweiterbarkeit, nicht auf Benutzeroberflächen oder Persistenz.
 
-> **Warnung**\
+> [!WARNING]
 > Dieses Projekt ist nicht für Produktionszwecke vorgesehen!
 
 ### Funktionen und Merkmale
