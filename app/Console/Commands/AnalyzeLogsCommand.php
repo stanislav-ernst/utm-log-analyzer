@@ -26,8 +26,6 @@ class AnalyzeLogsCommand extends Command
      */
     protected $description = 'Analyze UTM access logs.';
 
-    private array $entries = [];
-
     public function __construct(
         private readonly NginxAccessLogParser $parser,
         private readonly LicenseAccessAnalyzerService $licenseAccessAnalyzer,
@@ -48,6 +46,7 @@ class AnalyzeLogsCommand extends Command
      * Returns an appropriate status code indicating success or failure.
      *
      * @return int The status code indicating the result of the file processing.
+     * @throws Throwable
      */
     public function handle(): int
     {
@@ -66,22 +65,28 @@ class AnalyzeLogsCommand extends Command
         $errorCount = 0;
 
         $fileSize = filesize($path);
+
+        /**
+         * ----------------------------
+         * Progress Bar
+         * ----------------------------
+         */
         $progressBar = $this->output->createProgressBar($fileSize);
-        $progressBar->setMessage("Lines: {$parsedCount}", 'status');
-        $progressBar->setFormat(
-            '%status% | %percent%% [%bar%]'
-        );
+        $progressBar->setMessage('Lines: 0', 'status');
+        $progressBar->setFormat('%status% | %percent%% [%bar%]');
         $progressBar->start();
 
         foreach ($file as $line) {
             try {
                 $entry = $this->parser->parse(trim($line));
+
                 $this->licenseAccessAnalyzer->consume($entry);
                 $this->licenseDeviceAnalyzer->consume($entry);
                 $this->hardwareAnalyzer->consume($entry);
 
                 $parsedCount++;
-            } catch (Throwable $e) {
+            } catch (Throwable) {
+                // Here you could process the invalid lines.
                 $errorCount++;
             }
 

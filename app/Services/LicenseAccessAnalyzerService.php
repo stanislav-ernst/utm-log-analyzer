@@ -23,6 +23,7 @@ class LicenseAccessAnalyzerService
     public function consume(LogEntry $entry): void
     {
         $serial = $entry->serial;
+
         $this->counts[$serial] = ($this->counts[$serial] ?? 0) + 1;
     }
 
@@ -30,7 +31,7 @@ class LicenseAccessAnalyzerService
      * Retrieves the top serial numbers based on their count in descending order.
      *
      * @param  int  $limit  The maximum number of top serials to return. Defaults to 10.
-     * @return array An associative array of the top serials with their counts.
+     * @return array<string, int> An associative array of the top serials with their counts.
      */
     public function result(int $limit = 10): array
     {
