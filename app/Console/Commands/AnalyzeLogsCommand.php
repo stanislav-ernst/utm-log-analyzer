@@ -100,19 +100,19 @@ class AnalyzeLogsCommand extends Command
         $this->warn("Failed lines: {$errorCount}");
         $this->info('Top 10 license serials by access count:');
 
-        foreach ($this->licenseAccessAnalyzer->topSerials() as $serial => $count) {
+        foreach ($this->licenseAccessAnalyzer->result() as $serial => $count) {
             $this->line(sprintf('%s → %d requests', $serial, $count));
         }
 
         $this->info('Top 10 license serials with multiple devices:');
 
-        foreach ($this->licenseDeviceAnalyzer->violations() as $serial => $deviceCount) {
+        foreach ($this->licenseDeviceAnalyzer->result() as $serial => $deviceCount) {
             $this->line(sprintf('%s → %d distinct devices', $serial, $deviceCount));
         }
 
         $this->info('Hardware classes and active license count:');
 
-        foreach ($this->hardwareAnalyzer->summary() as $hardwareClass => $count) {
+        foreach ($this->hardwareAnalyzer->result() as $hardwareClass => $count) {
             $this->line(sprintf('%s → %d licenses', $hardwareClass, $count));
         }
 

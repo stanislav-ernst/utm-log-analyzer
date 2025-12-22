@@ -36,7 +36,7 @@ class HardwareAnalyzerService
      * @return array<string, int> An associative array where the keys are hardware classes and the values
      *                            are the counts of licenses for each class, sorted in descending order.
      */
-    public function summary(): array
+    public function result(): array
     {
         $result = [];
 

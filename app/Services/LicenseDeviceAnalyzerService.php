@@ -35,7 +35,7 @@ class LicenseDeviceAnalyzerService
      * @param  int  $limit  The maximum number of violations to return. Defaults to 10.
      * @return array<string, int> An associative array of serial numbers as keys and their respective counts as values.
      */
-    public function violations(int $limit = 10): array
+    public function result(int $limit = 10): array
     {
         $violations = [];
 

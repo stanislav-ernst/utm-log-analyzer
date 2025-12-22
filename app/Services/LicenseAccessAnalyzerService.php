@@ -32,7 +32,7 @@ class LicenseAccessAnalyzerService
      * @param  int  $limit  The maximum number of top serials to return. Defaults to 10.
      * @return array An associative array of the top serials with their counts.
      */
-    public function topSerials(int $limit = 10): array
+    public function result(int $limit = 10): array
     {
         arsort($this->counts);
 
