@@ -1,59 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# UTM Log-Analyzer
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Projektüberblick
 
-## About Laravel
+Dieses Projekt analysiert HTTP-Zugriffslogs von UTM-Appliances, die regelmäßig den Update-Server kontaktieren. Ziel ist es, aus einem Tageslog aussagekräftige Erkenntnisse über die Nutzung von
+Lizenzen, die Zuordnung zu physischen Geräten sowie die eingesetzte Hardware zu gewinnen.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Die Logdatei enthält neben den eigentlichen Zugriffsinformationen strukturierte Metadaten wie Lizenz-Seriennummern, Firmware-Versionen und einen komprimierten Block mit System- und
+Hardwareinformationen. Das Projekt verarbeitet diese Logdatei zeilenweise, dekodiert die enthaltenen System- und Hardwaredaten und wertet sie anschließend aus.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Die Umsetzung basiert auf dem [Laravel-Framework](https://laravel.com/docs) und legt besonderen Wert auf eine klare Trennung von Verantwortlichkeiten zwischen Log-Parsing, Datenaufbereitung und
+Analyse-Logik. Die Verarbeitung
+erfolgt speicherschonend, sodass auch sehr große Logdateien effizient analysiert werden können.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Das Projekt wurde im Rahmen einer technischen Testaufgabe erstellt und konzentriert sich bewusst auf Code-Qualität, Verständlichkeit und Erweiterbarkeit, nicht auf Benutzeroberflächen oder Persistenz.
 
-## Learning Laravel
+> **Warnung**\
+> Dieses Projekt ist nicht für Produktionszwecke vorgesehen!
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Funktionen und Merkmale
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+#### Zugriffshäufigkeit von Lizenzen
 
-## Laravel Sponsors
+- Ermittlung der zehn Lizenz-Seriennummern mit den meisten Zugriffen auf den Update-Server
+- Ausgabe der jeweiligen Anzahl von Zugriffsversuchen pro Lizenz
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+#### Erkennung von Lizenz-Mehrfachnutzung
 
-### Premium Partners
+- Identifikation von Lizenz-Seriennummern, die auf mehr als einem physischen Gerät verwendet werden
+- Bestimmung der zehn Lizenz-Seriennummern mit den meisten Gerätezuordnungen
+- Ermittlung der Anzahl unterschiedlicher Geräte pro betroffener Lizenz
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+#### Analyse der eingesetzten Hardware
 
-## Contributing
+- Dekodierung und Auswertung der in den specs-Metadaten enthaltenen System- und Hardwareinformationen
+- Klassifizierung der eingesetzten Hardware anhand reproduzierbarer Kriterien
+- Ermittlung der Anzahl aktiver Lizenzen pro Hardware-Klasse
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### Technische Merkmale
 
-## Code of Conduct
+- Zeilenweise, streamingbasierte Verarbeitung großer Logdateien
+- Nache zu konstantem Speicherverbrauch unabhängig von der Loggröße
+- Klare Trennung zwischen Parsing, Analyse und Datenrepräsentation
+- Erweiterbare Architektur für zusätzliche Auswertungen
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Technologie-Stack
 
-## Security Vulnerabilities
+- Laravel 12
+- PHP
+- NGINX/Apache
+- (Laravel Homestead - for local development)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Technologie-Anforderungen
 
-## License
+- PHP: ^8.3
+    - gzdecode zlib-Erweiterung
+- Composer: ^2.9.2
+- NPM: ^11.6.2
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Einrichtung
+
+Um die Erstkonfiguration durchzuführen, gehen Sie wie folgt vor:
+
+``` bash
+# Klonen Sie das Repository mit SSH
+git clone git@github.com:stanislav-ernst/utm-log-analyzer.git
+
+# oder klonen Sie das Repository über HTTPS
+git clone https://github.com/stanislav-ernst/utm-log-analyzer.git
+
+cd utm-log-analyzer
+
+# Composer-Abhängigkeit installieren (für lokale Entwicklung ohne --no-dev)
+composer install --no-dev
+
+# Erstellen Sie eine Umgebungsdatei (kopieren Sie die Datei .env.example nach .env)
+cp .env.example .env
+
+# Legen Sie Ihre APP_ENV, APP_DEBUG und APP_URL in Ihrer .env-Datei fest
+
+# Setzen Sie den Anwendungsschlüssel
+php artisan key:generate
+
+# Richten Sie die Datenbank ein
+php artisan migrate
+
+# Kompilieren Sie die Assets
+npm install && npm run build
+```
+
+## Verwendung
+
+Die Analyse wird über einen Artisan Command gestartet. Als Parameter wird der Pfad zur zu analysierenden Logdatei übergeben.
+
+```bash
+php artisan utm:analyze storage/app/private/utm-logs/[filename].log
+```
+
+Der Command liest die angegebene Logdatei zeilenweise ein, dekodiert die enthaltenen Metadaten und führt alle Auswertungen in einem Durchlauf durch. Die Ergebnisse der einzelnen Analysen werden
+anschließend direkt in der Konsole ausgegeben.
+
+Die Verarbeitung erfolgt speicherschonend und ist auch für sehr große Logdateien geeignet.
+
+## Zusammenarbeit
+
+### Versionskontrolle
+
+[GitHub Repository](https://github.com/stanislav-ernst/utm-log-analyzer) bereitgestellt von Stanislav Ernst.
+
+### Codierungsstil
+
+Laravel folgt dem PSR-2-Codierungsstandard und dem PSR-4-Autoloading-Standard.
+
+In diesem Projekt wird [Laravel Pint](https://laravel.com/docs/12.x/pint) verwendet, um sicherzustellen, dass der Code-Stil sauber und konsistent bleibt.
+Es wird empfohlen, nach jeder Fertigstellung einer Version der Anwendung Laravel Pint auszuführen.
+
+Die wichtigsten Artisan-Befehle:
+
+``` bash
+# Um Probleme mit dem Code-Stil zu beheben:
+./vendor/bin/pint
+
+# Führen Sie Pint für bestimmte Dateien oder Verzeichnisse aus:
+./vendor/bin/pint app/Console/Commands
+./vendor/bin/pint app/Console/Commands/AnalyzeLogsCommand.php
+```
+
+### Architektur
+
+Die Architektur trennt klar zwischen Log-Parsing, strukturierter Datenrepräsentation (DTOs) und Analyse-Logik. Ein zentraler Artisan Command übernimmt ausschließlich die Orchestrierung, während
+spezialisierte Analyzer-Services die fachlichen Auswertungen inkrementell durchführen.
+
+Alle Auswertungen erfolgen aggregiert und zustandsarm, es wird bewusst auf eine Persistenzschicht verzichtet. Die Struktur ermöglicht eine einfache Erweiterung um zusätzliche Analysen, ohne bestehende
+Komponenten zu verändern, und folgt den Best Practices des Laravel-Frameworks.
+
+## Ressourcen
+
+- https://laravel.com/docs/12.x
+- https://www.php.net
+- https://tailwindcss.com
+- https://www.material-tailwind.com
