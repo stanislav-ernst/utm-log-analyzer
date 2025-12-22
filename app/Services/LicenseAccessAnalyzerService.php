@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use App\DTO\LogEntry;
+use App\Services\Contracts\AnalyzerInterface;
 
-class LicenseAccessAnalyzerService
+class LicenseAccessAnalyzerService implements AnalyzerInterface
 {
     /**
      * Counted serials.

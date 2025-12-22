@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use App\DTO\LogEntry;
+use App\Services\Contracts\AnalyzerInterface;
 
-class LicenseDeviceAnalyzerService
+class LicenseDeviceAnalyzerService implements AnalyzerInterface
 {
     /**
      * serial => [deviceId => true]

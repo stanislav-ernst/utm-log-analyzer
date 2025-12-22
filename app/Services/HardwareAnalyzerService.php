@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use App\DTO\LogEntry;
+use App\Services\Contracts\AnalyzerInterface;
 
-class HardwareAnalyzerService
+class HardwareAnalyzerService implements AnalyzerInterface
 {
     /**
      * @var array<string, array<string, bool>> Stores licenses grouped by hardware classification and serial number.
