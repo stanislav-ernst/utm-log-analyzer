@@ -14,7 +14,7 @@ class HardwareAnalyzerService
     public function __construct() {}
 
     /**
-     * Processes the given log entry and stores it based on hardware classification and serial number.
+     * Consumes a log entry and groups licenses by hardware classification.
      *
      * @param  LogEntry  $entry  Instance of the log entry to be processed.
      */
@@ -27,11 +27,9 @@ class HardwareAnalyzerService
     }
 
     /**
-     * Generates a summary of hardware classes and their associated license counts.
+     * Returns a summary of hardware classes and their license counts in descending order.
      *
-     * Iterates through the licenses grouped by hardware class and calculates the number
-     * of licenses for each class. Only includes hardware classes with more than one license
-     * in the result. The summary is sorted in descending order based on the counts.
+     * Only includes hardware classes with more than one unique license.
      *
      * @param  int|null  $limit  The maximum number of entries to return. Defaults to 10.
      * @return array<string, int> An associative array of hardware classes and their license counts.

@@ -18,7 +18,7 @@ class LicenseAccessAnalyzerService
     /**
      * Consumes a log entry and updates the count for the associated serial.
      *
-     * @param  LogEntry  $entry  Log entry object containing the serial.
+     * @param  LogEntry  $entry  Instance of the log entry to be processed.
      */
     public function consume(LogEntry $entry): void
     {
@@ -28,10 +28,10 @@ class LicenseAccessAnalyzerService
     }
 
     /**
-     * Retrieves the top serial numbers based on their count in descending order.
+     * Returns the top serial numbers based on their count in descending order.
      *
-     * @param  int  $limit  The maximum number of top serials to return. Defaults to 10.
-     * @return array<string, int> An associative array of the top serials with their counts.
+     * @param  int  $limit  The maximum number of entries to return. Defaults to 10.
+     * @return array<string, int> An associative array of serials and their respective counts.
      */
     public function result(int $limit = 10): array
     {

@@ -16,7 +16,7 @@ class LicenseDeviceAnalyzerService
     public function __construct() {}
 
     /**
-     * Consumes a log entry and updates the devices by their serial number.
+     * Consumes a log entry and tracks unique devices associated with a serial.
      *
      * @param  LogEntry  $entry  Instance of the log entry to be processed.
      */
@@ -29,11 +29,10 @@ class LicenseDeviceAnalyzerService
     }
 
     /**
-     * Identifies serial numbers with multiple associated devices and ranks them
-     * in descending order of count, returning a limited subset of violations.
+     * Returns serials with multiple associated devices, ranked by count in descending order.
      *
-     * @param  int  $limit  The maximum number of violations to return. Defaults to 10.
-     * @return array<string, int> An associative array of serial numbers as keys and their respective counts as values.
+     * @param  int  $limit  The maximum number of entries to return. Defaults to 10.
+     * @return array<string, int> An associative array of serials and their respective device counts.
      */
     public function result(int $limit = 10): array
     {
