@@ -33,10 +33,10 @@ class HardwareAnalyzerService
      * of licenses for each class. Only includes hardware classes with more than one license
      * in the result. The summary is sorted in descending order based on the counts.
      *
-     * @return array<string, int> An associative array where the keys are hardware classes and the values
-     *                            are the counts of licenses for each class, sorted in descending order.
+     * @param  int|null  $limit  The maximum number of entries to return. Defaults to 10.
+     * @return array<string, int> An associative array of hardware classes and their license counts.
      */
-    public function result(): array
+    public function result(?int $limit = null): array
     {
         $result = [];
 
@@ -50,7 +50,11 @@ class HardwareAnalyzerService
 
         arsort($result);
 
-        return $result;
+        if ($limit === null) {
+            return $result;
+        }
+
+        return array_slice($result, 0, $limit, true);
     }
 
     /**
