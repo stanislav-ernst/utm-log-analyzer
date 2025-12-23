@@ -64,7 +64,11 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ $runs->links() }}
+                    @if ($runs->hasPages())
+                        <div class="mt-4">
+                            {{ $runs->links() }}
+                        </div>
+                    @endif
                 </div>
             </main>
         </div>
