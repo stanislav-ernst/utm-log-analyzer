@@ -4,20 +4,20 @@ namespace App\DTO;
 
 use DateTimeImmutable;
 
-final class LogEntry
+final readonly class LogEntry
 {
     public function __construct(
-        public readonly string $ipAddress,
-        public readonly string $updateServer,
-        public readonly DateTimeImmutable $timestamp,
-        public readonly string $httpMethod,
-        public readonly string $url,
-        public readonly int $statusCode,
-        public readonly int $responseSize,
-        public readonly string $proxy,
-        public readonly float $responseTime,
-        public readonly string $serial,
-        public readonly string $version,
-        public readonly Specs $specs,
+        public string $ipAddress,
+        public string $updateServer,
+        public DateTimeImmutable $timestamp,
+        public string $httpMethod,
+        public string $url,
+        public int $statusCode,
+        public int $responseSize,
+        public string $proxy,
+        public float $responseTime,
+        public string $serial,
+        public string $version,
+        public Specs $specs,
     ) {}
 }

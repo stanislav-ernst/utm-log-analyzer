@@ -2,18 +2,18 @@
 
 namespace App\DTO;
 
-final class Specs
+final readonly class Specs
 {
     public function __construct(
-        public readonly string $mac,
-        public readonly string $architecture,
-        public readonly string $machine,
-        public readonly int $memoryKb,
-        public readonly string $cpu,
-        public readonly int $diskRootKb,
-        public readonly int $diskDataKb,
-        public readonly string $uptime,
-        public readonly string $firmwareVersion,
+        public string $mac,
+        public string $architecture,
+        public string $machine,
+        public int $memoryKb,
+        public string $cpu,
+        public int $diskRootKb,
+        public int $diskDataKb,
+        public string $uptime,
+        public string $firmwareVersion,
     ) {}
 
     /**
