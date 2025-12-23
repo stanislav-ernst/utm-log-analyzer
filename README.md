@@ -12,7 +12,8 @@ Die Umsetzung basiert auf dem [Laravel-Framework](https://laravel.com/docs) und 
 Analyse-Logik. Die Verarbeitung
 erfolgt speicherschonend, sodass auch sehr große Logdateien effizient analysiert werden können.
 
-Das Projekt wurde im Rahmen einer technischen Testaufgabe erstellt und konzentriert sich bewusst auf Code-Qualität, Verständlichkeit und Erweiterbarkeit, nicht auf Benutzeroberflächen oder Persistenz.
+Das Projekt wurde im Rahmen einer technischen Testaufgabe erstellt und konzentriert sich auf Code-Qualität, Verständlichkeit und Erweiterbarkeit. Während auf eine komplexe Benutzeroberfläche
+verzichtet wurde, liegt der Fokus auf einer robusten CLI-Verarbeitung und der strukturierten Persistenz der Analyseergebnisse.
 
 > [!WARNING]
 > Dieses Projekt ist nicht für Produktionszwecke vorgesehen!
@@ -42,6 +43,7 @@ Das Projekt wurde im Rahmen einer technischen Testaufgabe erstellt und konzentri
 - Nache zu konstantem Speicherverbrauch unabhängig von der Loggröße
 - Klare Trennung zwischen Parsing, Analyse und Datenrepräsentation
 - Erweiterbare Architektur für zusätzliche Auswertungen
+- Persistente Ergebnis-Speicherung mittels SQLite zur Dokumentation und späteren Auswertung der Analyseläufe
 
 ## Technologie-Stack
 
@@ -127,11 +129,11 @@ Die wichtigsten Artisan-Befehle:
 
 ### Architektur
 
-Die Architektur trennt klar zwischen Log-Parsing, strukturierter Datenrepräsentation (DTOs) und Analyse-Logik. Ein zentraler Artisan Command übernimmt ausschließlich die Orchestrierung, während
-spezialisierte Analyzer-Services die fachlichen Auswertungen inkrementell durchführen.
+Die Architektur trennt klar zwischen Log-Parsing, strukturierter Datenrepräsentation (DTOs) und Analyse-Logik. Der zentrale Artisan-Command utm:analyze übernimmt die Orchestrierung: Er streamt die
+Log-Daten zeilenweise, während spezialisierte Analyzer-Services die fachlichen Auswertungen inkrementell durchführen.
 
-Alle Auswertungen erfolgen aggregiert und zustandsarm, es wird bewusst auf eine Persistenzschicht verzichtet. Die Struktur ermöglicht eine einfache Erweiterung um zusätzliche Analysen, ohne bestehende
-Komponenten zu verändern, und folgt den Best Practices des Laravel-Frameworks.
+Alle Analyseergebnisse sowie Metadaten zum Importvorgang werden am Ende eines Durchlaufs atomar in der Datenbank (SQLite) persistiert. Diese Struktur ermöglicht eine einfache Erweiterung um
+zusätzliche Analysen, ohne bestehende Komponenten zu verändern, und folgt den Best Practices des Laravel-Frameworks für CLI-basierte Datenverarbeitung.
 
 ## Ressourcen
 
